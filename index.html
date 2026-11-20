@@ -1,487 +1,348 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="FindSan - Agregator perbandingan harga terbaik untuk produk fisik. Temukan promo dan diskon terbesar hari ini.">
-    <title>FindSan - Agregator Harga Termurah</title>
-    <style>
-        /* CSS SAMA PERSIS SEPERTI SEBELUMNYA */
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; margin: 0; color: #333; -webkit-tap-highlight-color: transparent; }
-        .header { background: linear-gradient(135deg, #d30000, #990000); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); gap: 15px; }
-        .header-logo { margin: 0; font-size: 24px; font-weight: 900; color: white; letter-spacing: 1px; font-style: italic; white-space: nowrap; text-decoration: none; display: flex; align-items: center; gap: 10px;}
-        .search-container { flex-grow: 1; max-width: 600px; display: block; transition: 0.3s; }
-        .search-input-group { position: relative; display: flex; align-items: center; width: 100%; }
-        .search-box { width: 100%; padding: 10px 40px 10px 20px; border-radius: 20px; border: none; outline: none; font-size: 14px; box-sizing: border-box; }
-        .clear-btn { position: absolute; right: 12px; background: #e0e0e0; color: #555; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; transition: 0.2s; padding-bottom: 2px; }
-        .clear-btn:hover { background: #ccc; }
-        .header-right-panel { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; }
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .deliver-wrapper { display: flex; flex-direction: column; line-height: 1.2; justify-content: center; margin-right: 5px; }
-        .deliver-label { font-size: 11px; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
-        .deliver-country { display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 14px; color: white; }
-        .deliver-flag { width: 24px; height: 16px; border-radius: 2px; object-fit: cover; box-shadow: 0 1px 3px rgba(0,0,0,0.3); background: #eee; }
-        .dropdown-wrapper { position: relative; display: flex; align-items: center; }
-        .action-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .action-btn:hover { background: rgba(255,255,255,0.2); border-color: white; }
-        .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 10px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; display: none; flex-direction: column; min-width: 160px; z-index: 200; border: 1px solid #eee; max-height: 300px; overflow-y: auto; }
-        .dropdown-menu.show { display: flex; }
-        .drop-opt { padding: 12px 15px; font-size: 13px; font-weight: 600; color: #444; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .drop-opt:hover { background: #fdf2f2; color: #d30000; }
-        .opt-currency { font-size: 11px; color: #888; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; }
-        .drop-opt:hover .opt-currency { background: #ffe6e6; color: #d30000; }
-        .btn-login { background: white; color: #d30000; border: 2px solid white; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-left: 5px; }
-        .btn-login:hover { background: transparent; color: white; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remote Control Bot MT5</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.25);
+      --red: #ef4444;
+      --red-glow: rgba(239, 68, 68, 0.25);
+      --blue: #3b82f6;
+    }
 
-        .macro-nav { background: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; position: sticky; top: 62px; z-index: 99; }
-        .macro-tabs { display: flex; overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none; }
-        .macro-tabs::-webkit-scrollbar { display: none; }
-        .macro-btn { background: none; border: none; padding: 15px 20px; font-size: 14px; font-weight: bold; color: #777; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;}
-        .macro-btn:hover { color: #d30000; }
-        .macro-btn.active { color: #d30000; border-bottom: 3px solid #d30000; }
-        @media (min-width: 1001px) { .nav-icon { display: none !important; } .macro-btn { gap: 0; } }
-        .macro-links { display: flex; gap: 20px; font-size: 12px; font-weight: 600; color: #666; flex-shrink: 0; margin-left: 15px; }
-        .macro-links a { color: inherit; text-decoration: none; transition: 0.2s; }
-        .macro-links a:hover { color: #d30000; }
-        .ai-nav-btn { display: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
-        .main-wrapper { display: flex; max-width: 100%; margin: 20px 0 50px 0; padding: 0 15px; gap: 20px; align-items: flex-start; min-height: 60vh;}
-        .sidebar { width: 200px; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #eee; position: sticky; top: 130px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-        .sidebar-title { font-size: 13px; color: #888; font-weight: bold; margin-bottom: 10px; padding-left: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .cat-btn { background: transparent; color: #555; border: none; padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; transition: 0.2s; }
-        .cat-btn:hover { background: #f9f9f9; color: #d30000; }
-        .cat-btn.active { background: #ffe6e6; color: #d30000; }
-        .content-area { flex-grow: 1; width: 100%; overflow: hidden; }
-        
-        .banner-slider { position: relative; width: 100%; height: 280px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .banner-slides { display: flex; width: 100%; height: 100%; transition: transform 0.5s ease-in-out; }
-        .banner-img { min-width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .banner-dots { position: absolute; bottom: 15px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; }
-        .dot { width: 10px; height: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .dot.active { background-color: #d30000; transform: scale(1.2); }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-        .product-carousel-section { margin-bottom: 30px; }
-        .carousel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .carousel-title { font-size: 18px; font-weight: 900; color: #222; margin: 0; display: flex; align-items: center; gap: 8px; }
-        .carousel-link { font-size: 13px; color: #d30000; text-decoration: none; font-weight: bold; }
-        .horizontal-scroll { width: 100%; overflow: hidden; padding-bottom: 15px; }
-        .carousel-track { display: flex; width: max-content; }
-        .track-left { animation: marqueeLeft 35s linear infinite; }
-        .track-right { animation: marqueeRight 35s linear infinite; }
-        .carousel-track:hover { animation-play-state: paused; }
-        @keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        @keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
-        .horizontal-card { flex: 0 0 140px; margin-right: 12px; }
-        .horizontal-card img { height: 130px !important; }
-        .horizontal-card .card-body { padding: 10px; }
-        .horizontal-card h3 { font-size: 11px !important; margin-bottom: 6px !important; }
-        .horizontal-card .price-start { font-size: 10px !important; }
-        .horizontal-card .price { font-size: 15px !important; margin-bottom: 10px !important; }
-        .horizontal-card .btn-banding { font-size: 10px !important; padding: 6px !important; }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
 
-        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.04); transition: 0.3s; display: flex; flex-direction: column; text-decoration: none; color: inherit; border: 1px solid #eee; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: #d30000; }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-body { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
-        .card h3 { font-size: 13px; font-weight: normal; margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; line-height: 1.4; }
-        .price-start { color: #555; font-size: 11px; margin-bottom: 2px; font-weight: bold; }
-        .price { color: #d30000; font-size: 18px; font-weight: 900; margin-bottom: 15px; }
-        .btn-banding { background: white; color: #d30000; border: 1px solid #d30000; text-align: center; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; transition: all 0.2s; }
-        .card:hover .btn-banding { background: #d30000; color: white; }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-        .ai-sidebar { width: 340px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #eee; position: sticky; top: 130px; display: flex; flex-direction: column; height: calc(100vh - 150px); flex-shrink: 0; overflow: hidden; }
-        .ai-header { background: #d30000; color: white; padding: 15px; font-size: 14px; font-weight: bold; text-align: center; letter-spacing: 0.5px; position: relative; display: flex; justify-content: center; align-items: center; }
-        .ai-close-btn { display: none; } 
-        .ai-chat-box { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fdfdfd; scroll-behavior: smooth;}
-        .msg-ai { background: #f0f2f5; color: #333; padding: 12px; border-radius: 12px 12px 12px 2px; font-size: 13px; max-width: 90%; align-self: flex-start; line-height: 1.5; }
-        .msg-user { background: #ffe6e6; color: #d30000; padding: 12px; border-radius: 12px 12px 2px 12px; font-size: 13px; max-width: 85%; align-self: flex-end; font-weight: 600; line-height: 1.5; }
-        .ai-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-        .ai-chip { background: white; color: #d30000; border: 1px solid #d30000; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px;}
-        .ai-chip:hover { background: #ffe6e6; }
-        .vto-container { display: flex; gap: 10px; margin-top: 10px; }
-        .vto-slot { flex: 1; border: 2px dashed #ccc; border-radius: 8px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; transition: 0.3s;}
-        .vto-slot.filled { border: 2px solid #d30000; }
-        .vto-slot img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 1;}
-        .vto-slot span { position: absolute; bottom: 0; background: rgba(0,0,0,0.6); color: white; font-size: 10px; width: 100%; text-align: center; z-index: 2; padding: 4px 0; font-weight: bold;}
-        .vto-upload-btn { font-size: 30px; color: #999; cursor: pointer; z-index: 2; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.8);}
-        .vto-upload-btn:hover { color: #d30000; background: rgba(255,230,230,0.8); }
-        .ai-input-area { padding: 12px; border-top: 1px solid #eee; display: flex; gap: 8px; background: white; }
-        .ai-input-area input { flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; outline: none; font-size: 13px; }
-        .ai-input-area button { background: #d30000; color: white; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-        .footer { background: #111; color: #fff; padding: 40px 20px 20px; margin-top: 40px; }
-        .footer-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-        .footer-logo { font-size: 24px; font-weight: 900; font-style: italic; color: #d30000; text-decoration: none;}
-        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
-        .footer-links a { color: #aaa; text-decoration: none; font-size: 13px; transition: 0.2s; }
-        .footer-links a:hover { color: #fff; text-decoration: underline; }
-        .footer-bottom { text-align: center; color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+    .header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
 
-        @media (max-width: 1000px) {
-            .header { flex-wrap: wrap; gap: 12px; padding: 10px 15px; }
-            .header-logo { font-size: 22px; width: auto; text-align: left; }
-            .header-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
-            .deliver-wrapper { display: none; } 
-            .action-btn { font-size: 11px; padding: 5px 8px; gap: 4px;}
-            .btn-login { display: block; padding: 5px 12px; font-size: 11px; margin-left: 2px; }
-            .search-container { width: 100%; max-width: 100%; order: 3; margin-top: 5px; display: block; }
-            .macro-links { display: none; }
-            .nav-icon { display: block !important; font-size: 20px; }
-            .macro-nav { position: fixed; bottom: 0; top: auto; left: 0; width: 100%; background: white; border-top: 1px solid #e0e0e0; z-index: 999; padding: 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); box-sizing: border-box; }
-            .macro-tabs { width: 100%; display: flex; justify-content: space-between; overflow: visible; padding: 5px 0; }
-            .macro-btn { flex: 1; flex-direction: column; align-items: center; justify-content: center; padding: 6px 0; gap: 4px; border-bottom: none; border-top: 3px solid transparent; color: #888; font-size: 10px; }
-            .macro-btn.active { border-bottom: none; border-top: 3px solid #d30000; color: #d30000; background: #fffafb; border-radius: 8px 8px 0 0;}
-            .nav-text { font-size: 10px; font-weight: bold; line-height: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 2px;}
-            .ai-nav-btn { display: flex; position: relative; }
-            .ai-icon-wrapper { background: #d30000; color: white; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; margin-top: -18px; border: 3px solid white; box-shadow: 0 -2px 5px rgba(0,0,0,0.15); transition: 0.2s; }
-            .ai-sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: 85vh; margin-bottom: 0; z-index: 2000; transform: translateY(120%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px 20px 0 0; box-shadow: 0 -5px 25px rgba(0,0,0,0.2); }
-            .ai-sidebar.open { transform: translateY(0); }
-            .ai-close-btn { display: block; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: white; background: transparent; border: none; font-size: 20px; cursor: pointer; }
-            .main-wrapper { flex-direction: column; padding: 0 10px; margin-top: 15px; gap: 15px; margin-bottom: 30px; }
-            .sidebar { width: 100%; flex-direction: row; position: static; padding: 5px 0 10px 0; overflow-x: auto; box-shadow: none; border: none; border-bottom: 1px solid #eee; border-radius: 0; gap: 8px; -ms-overflow-style: none; scrollbar-width: none; }
-            .sidebar::-webkit-scrollbar { display: none; }
-            .sidebar-title { display: none; }
-            .cat-btn { padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; white-space: nowrap; font-size: 12px; }
-            .banner-slider { height: 140px; border-radius: 8px; margin-bottom: 15px; }
-            .horizontal-scroll { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; scroll-snap-type: x mandatory; padding-bottom: 10px;}
-            .horizontal-scroll::-webkit-scrollbar { display: none; }
-            .carousel-track { animation: none !important; width: max-content; } 
-            .horizontal-card { flex: 0 0 110px !important; margin-right: 8px !important; scroll-snap-align: start; } 
-            .horizontal-card img { height: 100px !important; }
-            .carousel-title { font-size: 15px; }
-            .carousel-link { font-size: 11px; }
-            .container { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
-            .card { border-radius: 8px; }
-            .card img { height: 120px; }
-            .card-body { padding: 8px; }
-            .card h3 { font-size: 11px; margin-bottom: 6px; }
-            .price { font-size: 15px; margin-bottom: 8px; }
-            .price-start { font-size: 10px; }
-            .btn-banding { font-size: 11px; padding: 6px; }
-            .footer { margin-bottom: 75px; padding: 30px 15px 15px; }
-            .footer-content { flex-direction: column; text-align: center; }
-            .footer-links { justify-content: center; }
-        }
-    </style>
+    .status-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
+      background: #334155;
+      color: #cbd5e1;
+    }
+
+    .badge.on { background: var(--green-glow); color: #34d399; border: 1px solid var(--green); }
+    .badge.off { background: var(--red-glow); color: #f87171; border: 1px solid var(--red); }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .btn-power {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-power:active { transform: scale(0.98); }
+    .btn-power:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-power.to-off { background: var(--red); box-shadow: 0 8px 20px var(--red-glow); }
+    .btn-power.to-on { background: var(--green); box-shadow: 0 8px 20px var(--green-glow); }
+
+    .meta {
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .actions-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn-sec {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-sec:hover { background: rgba(255, 255, 255, 0.05); }
+
+    .config {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      display: none;
+    }
+
+    .config.open { display: block; }
+
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .toast {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.82rem;
+      min-height: 18px;
+      color: #93c5fd;
+    }
+    .toast.err { color: #f87171; }
+  </style>
 </head>
 <body>
-
+  <div class="card">
     <div class="header">
-        <a href="index.html" class="header-logo" translate="no">FindSan</a>
-        <div class="search-container" id="top-search-container">
-            <div class="search-input-group">
-                <input type="text" id="main-search" class="search-box" data-i18n-ph="search_placeholder" placeholder="Cari barang atau tiket..." onkeyup="handleSearch()">
-                <button id="clear-search" class="clear-btn" onclick="clearSearchBtn()">&#10005;</button>
-            </div>
-        </div>
-        <div class="header-right-panel">
-            <div class="header-actions">
-                <div class="deliver-wrapper">
-                    <div class="deliver-label" data-i18n="deliver_to" translate="no">Kirim ke:</div>
-                    <div class="deliver-country">
-                        <img id="delivery-flag" class="deliver-flag" src="https://flagcdn.com/w40/id.png" alt="Flag">
-                        <span id="delivery-code" translate="no">Memuat...</span>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <button class="action-btn" onclick="toggleMenu('lang-drop')">🌐 <span id="disp-lang" translate="no">ID</span> ▾</button>
-                    <div class="dropdown-menu" id="lang-drop">
-                        <div class="drop-opt" onclick="setLanguage('id', 'ID')">🇮🇩 Indonesia</div>
-                        <div class="drop-opt" onclick="setLanguage('en', 'EN')">🇬🇧 English</div>
-                    </div>
-                </div>
-                <div class="dropdown-wrapper">
-                    <button class="action-btn" onclick="toggleMenu('curr-drop')">💵 <span id="disp-curr" translate="no">IDR</span> ▾</button>
-                    <div class="dropdown-menu" id="curr-drop">
-                        <div class="drop-opt" onclick="setCurrency('IDR')">Rupiah <span class="opt-currency">IDR</span></div>
-                        <div class="drop-opt" onclick="setCurrency('USD')">US Dollar <span class="opt-currency">USD</span></div>
-                    </div>
-                </div>
-                <button class="btn-login" data-i18n="login_btn" onclick="alert(t('login_alert'))">Masuk</button>
-            </div>
-        </div>
+      <h1>Channel Breakout Bot</h1>
+      <p>Remote ON / OFF via Cloudflare KV</p>
     </div>
 
-    <!-- TAUTAN MENU NAVIGASI (MENGGUNAKAN TAUTAN HALAMAN TERPISAH) -->
-    <div class="macro-nav">
-        <div class="macro-tabs">
-            <a href="index.html" class="macro-btn active">
-                <span class="nav-icon">📦</span><span class="nav-text" data-i18n="nav_phys">Produk Fisik</span>
-            </a>
-            <a href="digital.html" class="macro-btn">
-                <span class="nav-icon">💻</span><span class="nav-text" data-i18n="nav_digi">Produk Digital</span>
-            </a>
-            <button class="macro-btn ai-nav-btn" onclick="toggleAI()">
-                <div class="ai-icon-wrapper"><span class="nav-icon">🤖</span></div><span class="nav-text">FindSan AI</span>
-            </button>
-            <a href="tiket.html" class="macro-btn">
-                <span class="nav-icon">✈️</span><span class="nav-text" data-i18n="nav_ticket">Tiket & Travel</span>
-            </a>
-            <a href="promo.html" class="macro-btn">
-                <span class="nav-icon">🏷️</span><span class="nav-text" data-i18n="nav_deals">Promo</span>
-            </a>
-        </div>
-        <div class="macro-links">
-            <a href="about.html" data-i18n="about_link">Tentang FindSan</a>
-            <a href="help.html" data-i18n="help_link">Pusat Bantuan</a>
-            <a href="blog.html" data-i18n="blog_link">Blog</a>
-        </div>
+    <div class="status-box">
+      <div id="statusBadge" class="badge">
+        <span class="dot"></span>
+        <span id="statusText">MEMUAT...</span>
+      </div>
+
+      <button id="toggleBtn" class="btn-power to-on" disabled>Menghubungkan...</button>
+
+      <div class="meta">
+        Update terakhir: <strong id="lastUpdate">-</strong>
+      </div>
     </div>
 
-    <div class="main-wrapper">
-        <div class="sidebar" id="sidebar-container"></div>
-        <div class="content-area">
-            
-            <div id="standard-content-block">
-                <div class="banner-slider">
-                    <div class="banner-slides" id="banner-slides">
-                        <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1200&h=300&fit=crop" class="banner-img" alt="Promo">
-                        <img src="https://images.unsplash.com/photo-1607083206968-13611e3d76ba?q=80&w=1200&h=300&fit=crop" class="banner-img" alt="Flash Sale">
-                        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1200&h=300&fit=crop" class="banner-img" alt="Viral">
-                    </div>
-                    <div class="banner-dots"><span class="dot active" onclick="currentSlide(0)"></span><span class="dot" onclick="currentSlide(1)"></span><span class="dot" onclick="currentSlide(2)"></span></div>
-                </div>
-
-                <div id="carousel-wrappers">
-                    <div class="product-carousel-section"><div class="carousel-header"><h2 class="carousel-title" data-i18n="car1_title">⚡ Kejar Diskon FindSan</h2><a href="blog.html" class="carousel-link" data-i18n="see_all">Lihat Semua</a></div><div class="horizontal-scroll" id="carousel-1"></div></div>
-                    <div class="product-carousel-section"><div class="carousel-header"><h2 class="carousel-title" data-i18n="car2_title">🔥 Paling Banyak Dicari</h2><a href="blog.html" class="carousel-link" data-i18n="see_all">Lihat Semua</a></div><div class="horizontal-scroll" id="carousel-2"></div></div>
-                    <div class="product-carousel-section"><div class="carousel-header"><h2 class="carousel-title" data-i18n="car3_title">💎 Rekomendasi AI</h2><a href="blog.html" class="carousel-link" data-i18n="see_all">Lihat Semua</a></div><div class="horizontal-scroll" id="carousel-3"></div></div>
-                    <hr style="border: 0; height: 1px; background: #ddd; margin: 40px 0 10px 0;">
-                </div>
-            </div>
-
-            <h2 class="carousel-title" id="grid-title" style="margin: 25px 0 15px 0;" data-i18n="grid_title">Semua Penawaran Terbaik</h2>
-            <div class="container" id="product-container"></div>
-        </div>
-
-        <div class="ai-sidebar" id="ai-sidebar">
-            <div class="ai-header"><span data-i18n="ai_header">🤖 Asisten Cerdas FindSan</span><button class="ai-close-btn" onclick="toggleAI()">&#10005;</button></div>
-            <div class="ai-chat-box" id="ai-chat-box">
-                <div class="msg-ai" id="welcome-msg">
-                    <div data-i18n="ai_welcome">Halo! Saya AI FindSan. Ingin mencari barang termurah hari ini? Ketik saja di bawah! 👇</div>
-                    <div class="ai-chips">
-                        <button class="ai-chip" onclick="triggerAISpecs()" data-i18n="chip_specs">📊 Bandingkan Spesifikasi</button>
-                        <button class="ai-chip" onclick="triggerAIVTO()" data-i18n="chip_vto">👗 Virtual Try-On (Coba Baju)</button>
-                    </div>
-                </div>
-            </div>
-            <div class="ai-input-area"><input type="text" id="ai-input" data-i18n-ph="ai_ph" placeholder="Tanya sesuatu..." onkeypress="handleEnter(event)"><button onclick="sendChat()" data-i18n="ai_btn">Kirim</button></div>
-        </div>
+    <div class="note">
+      <strong>OFF:</strong> Bot berhenti entry baru di semua pair.<br />
+      <strong>ON:</strong> Bot otomatis membuat garis baru &amp; reset catatan loss dalam maks. 1 menit.
     </div>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <a href="index.html" class="footer-logo" translate="no">FindSan</a>
-            <div class="footer-links"><a href="about.html" data-i18n="footer_about">Tentang Kami</a><a href="privacy.html" data-i18n="footer_privacy">Kebijakan Privasi</a><a href="terms.html" data-i18n="footer_terms">Syarat & Ketentuan</a><a href="contact.html" data-i18n="footer_contact">Hubungi Kami</a></div>
-        </div>
-        <div class="footer-bottom" data-i18n="footer_rights">© 2026 FindSan. Hak Cipta Dilindungi.</div>
-    </footer>
+    <div class="actions-row">
+      <button class="btn-sec" id="refreshBtn">Refresh Status</button>
+      <button class="btn-sec" id="configBtn">Ubah URL</button>
+    </div>
 
-    <script>
-        let globalRates = {}; let currentLang = 'id'; let currentCurr = 'IDR'; 
+    <div id="configPanel" class="config">
+      <div class="field">
+        <label for="workerUrl">URL Cloudflare Worker</label>
+        <input type="url" id="workerUrl" placeholder="https://bot-kamu.subdomain.workers.dev" />
+      </div>
+      <button class="btn-save" id="saveConfigBtn">Simpan &amp; Muat Ulang</button>
+    </div>
 
-        const dict = {
-            id: { 
-                sponsor_article: "📖 Inspirasi & Artikel Perjalanan", nav_deals: "Promo", cat_deals_all: "Semua Promo", cat_flash_sale: "Flash Sale", cat_coupons: "Kupon Diskon", blog_link: "Blog", about_link: "Tentang FindSan", help_link: "Pusat Bantuan", deliver_to: "Kirim ke:", search_placeholder: "Cari barang...", login_btn: "Masuk", login_alert: "Segera Hadir!", nav_phys: "Produk Fisik", nav_digi: "Produk Digital", nav_ticket: "Tiket & Travel", car1_title: "⚡ Kejar Diskon FindSan", car2_title: "🔥 Paling Banyak Dicari", car3_title: "💎 Rekomendasi AI", see_all: "Lihat Semua", grid_title: "Semua Penawaran Terbaik", ai_header: "🤖 Asisten Cerdas FindSan", ai_welcome: "Halo! Saya AI FindSan. Ingin mencari barang termurah hari ini? Ketik saja di bawah! 👇", ai_ph: "Tanya sesuatu...", ai_btn: "Kirim", price_lowest: "🔥 Terendah:", price_flash: "🔥 Diskon Kilat:", btn_compare: "Bandingkan", cat_all: "Semua", cat_elec: "Elektronik", cat_beauty: "Kecantikan", cat_shoes: "Sepatu", cat_clothes: "Pakaian", cat_soft: "Software", cat_asset: "Aset Kreatif", cat_book: "E-Book", cat_flight: "Tiket Pesawat", cat_hotel: "Hotel", cat_event: "Event & Konser", search_result: "🔍 Hasil pencarian", search_in: "di", not_found: "Maaf, tidak ditemukan di", ai_processing: "Memproses...", travel_hero_title: "Temukan penawaran tiket terbaik ke mana saja", travel_from: "Dari", travel_to: "Ke", travel_depart: "Berangkat", travel_return: "Pulang", travel_passengers: "Penumpang & Kelas", travel_search_flight: "Cari Tiket", travel_dest: "Tujuan / Nama Hotel", travel_checkin: "Check-in", travel_checkout: "Check-out", travel_guests: "Tamu & Kamar", travel_search_hotel: "Cari Hotel", travel_event_name: "Nama Event / Artis", travel_location: "Lokasi", travel_date: "Tanggal", travel_search_event: "Cari Event", chip_specs: "📊 Bandingkan Spesifikasi", chip_vto: "👗 Virtual Try-On (Coba Baju)", vto_instruction: "Silakan unggah foto produk & foto full badan Anda untuk dicocokkan:", vto_product: "Foto Produk", vto_user: "Foto Anda", vto_check: "Cek Kecocokan ✨", footer_about: "Tentang Kami", footer_privacy: "Kebijakan Privasi", footer_terms: "Syarat & Ketentuan", footer_contact: "Hubungi Kami", footer_rights: "© 2026 FindSan. Hak Cipta Dilindungi."
-            },
-            en: { 
-                sponsor_article: "📖 Travel Inspiration & Articles", nav_deals: "Deals", cat_deals_all: "All Deals", cat_flash_sale: "Flash Sale", cat_coupons: "Coupons", blog_link: "Blog", about_link: "About FindSan", help_link: "Help Center", deliver_to: "Deliver to:", search_placeholder: "Search items...", login_btn: "Sign in", login_alert: "Coming Soon!", nav_phys: "Physical Goods", nav_digi: "Digital Goods", nav_ticket: "Tickets & Travel", car1_title: "⚡ FindSan Flash Sale", car2_title: "🔥 Most Searched", car3_title: "💎 AI Recommendations", see_all: "See All", grid_title: "All Best Deals", ai_header: "🤖 FindSan Smart Assistant", ai_welcome: "Hello! Looking for the cheapest items today? 👇", ai_ph: "Ask something...", ai_btn: "Send", price_lowest: "🔥 Lowest:", price_flash: "🔥 Flash Deal:", btn_compare: "Compare", cat_all: "All", cat_elec: "Electronics", cat_beauty: "Beauty", cat_shoes: "Shoes", cat_clothes: "Clothing", cat_soft: "Software", cat_asset: "Creative Assets", cat_book: "E-Books", cat_flight: "Flights", cat_hotel: "Hotels", cat_event: "Events", search_result: "🔍 Search results for", search_in: "in", not_found: "Sorry, no products found in", ai_processing: "Processing...", travel_hero_title: "Find the best flight deals anywhere", travel_from: "From", travel_to: "To", travel_depart: "Depart", travel_return: "Return", travel_passengers: "Travellers and cabin class", travel_search_flight: "Search", travel_dest: "Destination or Hotel Name", travel_checkin: "Check-in", travel_checkout: "Check-out", travel_guests: "Guests and Rooms", travel_search_hotel: "Search Hotels", travel_event_name: "Event or Artist Name", travel_location: "Location", travel_date: "Date", travel_search_event: "Search Events", chip_specs: "📊 Compare Specifications", chip_vto: "👗 Virtual Try-On", vto_instruction: "Please upload the product photo & your full body photo to check the fit:", vto_product: "Product Photo", vto_user: "Your Photo", vto_check: "Check Fit ✨", footer_about: "About Us", footer_privacy: "Privacy Policy", footer_terms: "Terms of Service", footer_contact: "Contact Us", footer_rights: "© 2026 FindSan. All rights reserved."
-            }
-        };
+    <div id="toast" class="toast"></div>
+  </div>
 
-        function t(key) { return dict[currentLang]?.[key] || dict['id'][key] || key; }
+  <script>
+    // === GANTI URL WORKER KAMU DI SINI ===
+    const DEFAULT_WORKER_URL = "https://nama-worker-kamu.subdomain.workers.dev";
 
-        function updateDOMText() {
-            document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t(el.getAttribute('data-i18n')); });
-            document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
-        }
+    const statusBadge   = document.getElementById("statusBadge");
+    const statusText    = document.getElementById("statusText");
+    const toggleBtn     = document.getElementById("toggleBtn");
+    const lastUpdateEl  = document.getElementById("lastUpdate");
+    const refreshBtn    = document.getElementById("refreshBtn");
+    const configBtn     = document.getElementById("configBtn");
+    const configPanel   = document.getElementById("configPanel");
+    const workerUrlIn   = document.getElementById("workerUrl");
+    const saveConfigBtn = document.getElementById("saveConfigBtn");
+    const toastEl       = document.getElementById("toast");
 
-        async function initGlobalSystem() {
-            try {
-                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-                let detectedCode = 'ID';
-                if (tz.includes("Jakarta") || tz.includes("Makassar")) detectedCode = 'ID';
-                else if (tz.includes("Kuala_Lumpur")) detectedCode = 'MY';
-                else { const ipData = await (await fetch('https://ipapi.co/json/')).json(); if(ipData.country_code) detectedCode = ipData.country_code; }
+    let currentEnabled = null;
 
-                document.getElementById('delivery-flag').src = `https://flagcdn.com/w40/${detectedCode.toLowerCase()}.png`;
-                document.getElementById('delivery-code').innerText = detectedCode;
-                if (detectedCode === 'ID') { setLanguage('id', 'ID', false); setCurrency('IDR', false); } else { setLanguage('en', 'EN', false); setCurrency('USD', false); }
-                
-                globalRates = (await (await fetch('https://open.er-api.com/v6/latest/IDR')).json()).rates; 
-                renderProducts(); renderHorizontalCarousels(); buildSidebar();
-            } catch(e) {
-                globalRates = { 'IDR': 1, 'USD': 0.000065 };
-                setCurrency('IDR', false); setLanguage('id', 'ID', false);
-                renderProducts(); renderHorizontalCarousels(); buildSidebar();
-            }
-        }
+    function getWorkerUrl() {
+      return (localStorage.getItem("cb_worker_url") || DEFAULT_WORKER_URL).replace(/\/+$/, "");
+    }
 
-        function formatMoney(baseIDR) { 
-            const converted = baseIDR * (globalRates[currentCurr] || 1);
-            return new Intl.NumberFormat(currentLang, { style: 'currency', currency: currentCurr }).format(converted);
-        }
+    function showToast(msg, isError = false) {
+      toastEl.textContent = msg;
+      toastEl.className = isError ? "toast err" : "toast";
+    }
 
-        function toggleMenu(menuId) { document.querySelectorAll('.dropdown-menu').forEach(el => { if(el.id !== menuId) el.classList.remove('show'); }); document.getElementById(menuId).classList.toggle('show'); }
-        window.onclick = function(event) { if (!event.target.closest('.dropdown-wrapper')) { document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('show')); } }
+    function renderState(data) {
+      currentEnabled = Boolean(data.enabled);
+      toggleBtn.disabled = false;
 
-        function setLanguage(lang, label, doRender=true) { 
-            currentLang = lang; document.getElementById('disp-lang').innerText = label; document.getElementById('lang-drop').classList.remove('show'); 
-            updateDOMText(); if(doRender) { buildSidebar(); renderProducts(); renderHorizontalCarousels(); } 
-        }
-        function setCurrency(currency, doRender=true) { 
-            currentCurr = currency; document.getElementById('disp-curr').innerText = currency; document.getElementById('curr-drop').classList.remove('show'); 
-            if(doRender) { renderProducts(); renderHorizontalCarousels(); } 
-        }
+      if (currentEnabled) {
+        statusBadge.className = "badge on";
+        statusText.textContent = "BOT AKTIF (ON)";
+        toggleBtn.className = "btn-power to-off";
+        toggleBtn.textContent = "MATIKAN BOT (OFF)";
+      } else {
+        statusBadge.className = "badge off";
+        statusText.textContent = "BOT BERHENTI (OFF)";
+        toggleBtn.className = "btn-power to-on";
+        toggleBtn.textContent = "HIDUPKAN BOT (ON + GARIS BARU)";
+      }
 
-        function toggleAI() { document.getElementById('ai-sidebar').classList.toggle('open'); }
+      if (data.updated_at) {
+        const dt = new Date(data.updated_at);
+        lastUpdateEl.textContent = isNaN(dt) ? data.updated_at : dt.toLocaleString("id-ID");
+      }
+    }
 
-        let slideIndex = 0; let slideTimer;
-        function showSlides(index) { const slides = document.getElementById("banner-slides"); const dots = document.querySelectorAll(".dot"); if (index >= dots.length) slideIndex = 0; if (index < 0) slideIndex = dots.length - 1; slides.style.transform = `translateX(-${slideIndex * 100}%)`; dots.forEach(dot => dot.classList.remove("active")); dots[slideIndex].classList.add("active"); }
-        function currentSlide(index) { slideIndex = index; showSlides(slideIndex); resetTimer(); }
-        function autoSlide() { slideIndex++; showSlides(slideIndex); }
-        function resetTimer() { clearInterval(slideTimer); slideTimer = setInterval(autoSlide, 3500); }
-        slideTimer = setInterval(autoSlide, 3500);
+    async function fetchStatus() {
+      const url = getWorkerUrl();
+      if (!url || url.includes("nama-worker-kamu")) {
+        configPanel.classList.add("open");
+        showToast("Masukkan URL Cloudflare Worker kamu dulu.", true);
+        return;
+      }
 
-        // --- KHUSUS HALAMAN FISIK (index.html), DATABASE HANYA BERISI PRODUK FISIK ---
-        const dbItems = [
-            { id: "p1", category: "cat_elec", name: "Smartphone Flagship 256GB - Titanium", img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=500", price: 23500000 },
-            { id: "p1_alt", category: "cat_elec", name: "Tablet Pintar Stylus Pen Pro", img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=500", price: 15999000 },
-            { id: "p1_mac", category: "cat_elec", name: "Laptop Ultrabook Pro 14-inch", img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=500", price: 31000000 },
-            { id: "p1_cam", category: "cat_elec", name: "Kamera Mirrorless Full Frame", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=500", price: 35000000 },
-            { id: "p1_head", category: "cat_elec", name: "Headphone Bluetooth Noise Cancelling", img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=500", price: 5500000 },
-            { id: "p2", category: "cat_beauty", name: "Sanlucid Midnight Bloom Eau de Parfum", img: "https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=500", price: 299000 },
-            { id: "p2_alt", category: "cat_beauty", name: "Serum Wajah Niacinamide Glowing", img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=500", price: 125000 },
-            { id: "p2_lip", category: "cat_beauty", name: "Matte Liquid Lipstick Velvet", img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=500", price: 85000 },
-            { id: "p2_wash", category: "cat_beauty", name: "Gentle Facial Cleanser 150ml", img: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=500", price: 65000 },
-            { id: "p3", category: "cat_shoes", name: "Sepatu Lari Olahraga Pria", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=500", price: 1400000 },
-            { id: "p3_alt", category: "cat_shoes", name: "Sneakers Olahraga Ringan Premium", img: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=500", price: 2100000 },
-            { id: "p3_conv", category: "cat_shoes", name: "Sepatu Kanvas Kasual Klasik", img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=500", price: 850000 },
-            { id: "p3_form", category: "cat_shoes", name: "Sepatu Kulit Oxford Pantofel", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=500", price: 1200000 },
-            { id: "p4_cloth", category: "cat_clothes", name: "Jaket Kulit Premium Pria", img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=500", price: 450000 },
-            { id: "p4_denim", category: "cat_clothes", name: "Jaket Denim Oversize Biru Klasik", img: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?q=80&w=500", price: 320000 },
-            { id: "p4_tshirt", category: "cat_clothes", name: "Kaos Polos Cotton Combed 30s", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=500", price: 45000 },
-            { id: "p4_hoodie", category: "cat_clothes", name: "Hoodie Pria Wanita Basic Fleece", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=500", price: 150000 }
-        ];
+      toggleBtn.disabled = true;
+      showToast("Mengambil status dari server...");
 
-        const rCats = { "Fisik": ["cat_all", "cat_elec", "cat_beauty", "cat_shoes", "cat_clothes"] };
-        let currentCategory = "cat_all"; let searchQuery = ""; 
+      try {
+        const res = await fetch(`${url}/status`, {
+          method: "GET",
+          cache: "no-store"
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
-        function handleSearch() {
-            const input = document.getElementById("main-search"); const clearBtn = document.getElementById("clear-search");
-            const carouselSection = document.getElementById("carousel-wrappers"); const gridTitle = document.getElementById("grid-title");
-            searchQuery = input.value.trim().toLowerCase();
-            if (searchQuery.length > 0) { clearBtn.style.display = "flex"; if(carouselSection) carouselSection.style.display = "none"; gridTitle.innerHTML = `${t('search_result')} "${input.value}" ${t('search_in')} ${t('nav_phys')}`; } 
-            else { clearBtn.style.display = "none"; if(carouselSection) carouselSection.style.display = "block"; gridTitle.innerHTML = t('grid_title'); }
-            renderProducts();
-        }
+        renderState(data);
+        showToast("Status tersinkron.");
+      } catch (err) {
+        showToast("Gagal terhubung: " + err.message, true);
+      }
+    }
 
-        function clearSearchBtn() {
-            document.getElementById("main-search").value = ""; searchQuery = ""; document.getElementById("clear-search").style.display = "none";
-            if(document.getElementById("carousel-wrappers")) document.getElementById("carousel-wrappers").style.display = "block"; 
-            document.getElementById("grid-title").innerHTML = t('grid_title');
-            renderProducts();
-        }
+    async function toggleBot() {
+      if (currentEnabled === null) return;
+      const url = getWorkerUrl();
+      const targetState = !currentEnabled;
 
-        function renderHorizontalCarousels() {
-            const carouselIds = ["carousel-1", "carousel-2", "carousel-3"];
-            if (dbItems.length === 0) return;
-            const isMobile = window.innerWidth <= 900;
-            carouselIds.forEach((id, index) => {
-                const container = document.getElementById(id); if(!container) return; let html = "";
-                let shuffled = [...dbItems].sort(() => 0.5 - Math.random());
-                shuffled.forEach(item => {
-                    html += `<a href="detail.html?id=${item.id}" target="_blank" class="card horizontal-card"><img src="${item.img}" alt="${item.name}"><div class="card-body"><h3>${item.name}</h3><div class="price-start">${t('price_flash')}</div><div class="price">${formatMoney(item.price * 0.95)}</div><div class="btn-banding">${t('btn_compare')}</div></div></a>`;
-                });
-                if (isMobile) { container.innerHTML = `<div class="carousel-track">${html}</div>`; } else { const directionClass = (index % 2 === 0) ? "track-left" : "track-right"; container.innerHTML = `<div class="carousel-track ${directionClass}">${html}${html}</div>`; }
-            });
-        }
+      toggleBtn.disabled = true;
+      showToast(targetState ? "Menghidupkan bot..." : "Mematikan bot...");
 
-        function renderProducts() {
-            const container = document.getElementById("product-container"); let htmlContent = "";
-            let filtered = dbItems;
-            if (searchQuery !== "") { filtered = filtered.filter(item => item.name.toLowerCase().includes(searchQuery)); } 
-            else if (currentCategory !== "cat_all") { filtered = filtered.filter(item => item.category === currentCategory); }
-            
-            if(filtered.length === 0) { container.innerHTML = `<h3 style="grid-column: 1/-1; text-align: center; color: #888; padding: 40px;">${t('not_found')} ${t('nav_phys')}.</h3>`; return; }
-            
-            filtered.forEach(item => {
-                htmlContent += `<a href="detail.html?id=${item.id}" target="_blank" class="card"><img src="${item.img}" alt="${item.name}"><div class="card-body"><h3>${item.name}</h3><div class="price-start">${t('price_lowest')}</div><div class="price">${formatMoney(item.price)}</div><div class="btn-banding">${t('btn_compare')}</div></div></a>`;
-            });
-            container.innerHTML = htmlContent;
-        }
+      try {
+        const res = await fetch(`${url}/toggle`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled: targetState })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
-        function selectCategory(categoryKey, btnElement) { 
-            currentCategory = categoryKey; document.querySelectorAll(".cat-btn").forEach(btn => btn.classList.remove("active")); btnElement.classList.add("active"); clearSearchBtn(); 
-        }
+        renderState(data);
+        showToast(targetState
+          ? "Bot ON! MT5 akan membuat garis baru dalam maks. 1 menit."
+          : "Bot OFF! MT5 berhenti membuka entry baru.");
+      } catch (err) {
+        toggleBtn.disabled = false;
+        showToast("Gagal mengubah status: " + err.message, true);
+      }
+    }
 
-        function buildSidebar() { 
-            const sidebarContainer = document.getElementById("sidebar-container"); let sidebarHTML = `<div class="sidebar-title">Kategori</div>`; 
-            rCats["Fisik"].forEach((catKey) => { sidebarHTML += `<button class="cat-btn ${currentCategory === catKey ? "active" : ""}" onclick="selectCategory('${catKey}', this)">${t(catKey)}</button>`; }); 
-            sidebarContainer.innerHTML = sidebarHTML; 
-        }
+    toggleBtn.addEventListener("click", toggleBot);
+    refreshBtn.addEventListener("click", fetchStatus);
+    configBtn.addEventListener("click", () => configPanel.classList.toggle("open"));
+    saveConfigBtn.addEventListener("click", () => {
+      localStorage.setItem("cb_worker_url", workerUrlIn.value.trim().replace(/\/+$/, ""));
+      configPanel.classList.remove("open");
+      fetchStatus();
+    });
 
-        // ==========================================
-        // SISTEM LOGIKA AI (VIRTUAL TRY-ON & SPECS)
-        // ==========================================
-        function addAiMessage(text, isHtml = false) {
-            const chatBox = document.getElementById("ai-chat-box");
-            if(isHtml) { chatBox.innerHTML += `<div class="msg-ai">${text}</div>`; } else { chatBox.innerHTML += `<div class="msg-ai">${text}</div>`; }
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function removeProcessing() {
-            const msgs = document.getElementsByClassName("processing-msg");
-            while(msgs.length > 0){ msgs[0].parentNode.removeChild(msgs[0]); }
-        }
-
-        function sendChat(forceText = null) { 
-            const inputField = document.getElementById("ai-input"); const chatBox = document.getElementById("ai-chat-box"); 
-            const text = forceText || inputField.value.trim();
-            if(text === "") return; 
-            const chipContainer = document.querySelector('.ai-chips'); if (chipContainer) chipContainer.remove();
-            chatBox.innerHTML += `<div class="msg-user">${text}</div>`; inputField.value = ""; chatBox.scrollTop = chatBox.scrollHeight; 
-            setTimeout(() => { chatBox.innerHTML += `<div class="msg-ai processing-msg">${t('ai_processing')}</div>`; chatBox.scrollTop = chatBox.scrollHeight; }, 600); 
-        }
-
-        function handleEnter(event) { if (event.key === "Enter") { sendChat(); } }
-
-        function triggerAISpecs() {
-            sendChat(t('chip_specs'));
-            setTimeout(() => { removeProcessing(); addAiMessage(`Sebutkan dua barang yang ingin Anda bandingkan (contoh: "Bandingkan harga Smartphone Flagship dengan Tablet Pintar").`); }, 1500);
-        }
-
-        function triggerAIVTO() {
-            sendChat(t('chip_vto'));
-            setTimeout(() => {
-                removeProcessing();
-                const vtoHtml = `
-                    <div style="margin-bottom: 10px;">${t('vto_instruction')}</div>
-                    <div class="vto-container"><div class="vto-slot" id="product-photo-slot"><input type="file" id="product-photo" accept="image/*" onchange="previewPhoto(event, 'product-photo-slot')" hidden><label for="product-photo" class="vto-upload-btn">+</label><span>${t('vto_product')}</span></div><div class="vto-slot" id="user-photo-slot"><input type="file" id="user-photo" accept="image/*" onchange="previewPhoto(event, 'user-photo-slot')" hidden><label for="user-photo" class="vto-upload-btn">+</label><span>${t('vto_user')}</span></div></div>
-                    <button class="btn-banding" style="width:100%; margin-top:15px; border-radius:8px; padding: 10px; font-size: 13px; background:#d30000; color:white;" onclick="processVirtualTryOn()">${t('vto_check')}</button>
-                `;
-                addAiMessage(vtoHtml, true);
-            }, 1200);
-        }
-
-        function previewPhoto(event, slotId) {
-            const file = event.target.files[0];
-            if (file) {
-                const imageUrl = URL.createObjectURL(file); const slot = document.getElementById(slotId); slot.classList.add('filled');
-                const label = slot.querySelector('.vto-upload-btn'); if(label) label.style.display = 'none';
-                let existingImg = slot.querySelector('img'); if (existingImg) { existingImg.src = imageUrl; } else { slot.innerHTML += `<img src="${imageUrl}" alt="Uploaded">`; }
-            }
-        }
-
-        function processVirtualTryOn() {
-            const slotUser = document.getElementById('user-photo-slot'); const slotProduct = document.getElementById('product-photo-slot');
-            if (!slotUser.classList.contains('filled') || !slotProduct.classList.contains('filled')) { alert("Harap unggah KEDUA foto (Foto Produk & Foto Anda) terlebih dahulu!"); return; }
-            addAiMessage("🤖 Memindai bentuk pakaian dan proporsi tubuh Anda...");
-            setTimeout(() => { removeProcessing(); addAiMessage(`✨ <b>Sangat Cocok!</b><br><br>Berdasarkan analisis visual AI, potongan pakaian dari foto produk ini akan sangat pas dengan proporsi tubuh Anda. Warna pakaian juga melengkapi *skin tone* Anda. Tingkat kecocokan: <b>95%</b>. Langsung sikat!`, true); }, 2000);
-        }
-
-        initGlobalSystem(); 
-    </script>
+    workerUrlIn.value = getWorkerUrl();
+    fetchStatus();
+  </script>
 </body>
 </html>
