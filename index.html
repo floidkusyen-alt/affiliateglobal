@@ -15,7 +15,6 @@
       --green-glow: rgba(16, 185, 129, 0.25);
       --red: #ef4444;
       --red-glow: rgba(239, 68, 68, 0.25);
-      --blue: #3b82f6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -120,19 +119,13 @@
       border: 1px solid rgba(59, 130, 246, 0.25);
       border-radius: 10px;
       padding: 12px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       line-height: 1.5;
     }
 
-    .actions-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .btn-sec {
-      flex: 1;
-      padding: 10px;
+    .btn-refresh {
+      width: 100%;
+      padding: 11px;
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 10px;
@@ -142,43 +135,7 @@
       cursor: pointer;
     }
 
-    .btn-sec:hover { background: rgba(255, 255, 255, 0.05); }
-
-    .config {
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-      display: none;
-    }
-
-    .config.open { display: block; }
-
-    .field { margin-bottom: 12px; }
-    .field label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
-    .field input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 0.85rem;
-    }
-
-    .btn-save {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: var(--blue);
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-refresh:hover { background: rgba(255, 255, 255, 0.05); }
 
     .toast {
       margin-top: 12px;
@@ -215,42 +172,22 @@
       <strong>ON:</strong> Bot otomatis membuat garis baru &amp; reset catatan loss dalam maks. 1 menit.
     </div>
 
-    <div class="actions-row">
-      <button class="btn-sec" id="refreshBtn">Refresh Status</button>
-      <button class="btn-sec" id="configBtn">Ubah URL</button>
-    </div>
-
-    <div id="configPanel" class="config">
-      <div class="field">
-        <label for="workerUrl">URL Cloudflare Worker</label>
-        <input type="url" id="workerUrl" placeholder="https://bot-kamu.subdomain.workers.dev" />
-      </div>
-      <button class="btn-save" id="saveConfigBtn">Simpan &amp; Muat Ulang</button>
-    </div>
+    <button class="btn-refresh" id="refreshBtn">Refresh Status</button>
 
     <div id="toast" class="toast"></div>
   </div>
 
   <script>
-    // === GANTI URL WORKER KAMU DI SINI ===
-    const DEFAULT_WORKER_URL = "https://nama-worker-kamu.subdomain.workers.dev";
+    const WORKER_URL = "https://cool-rain-1302.floidkusyen.workers.dev";
 
-    const statusBadge   = document.getElementById("statusBadge");
-    const statusText    = document.getElementById("statusText");
-    const toggleBtn     = document.getElementById("toggleBtn");
-    const lastUpdateEl  = document.getElementById("lastUpdate");
-    const refreshBtn    = document.getElementById("refreshBtn");
-    const configBtn     = document.getElementById("configBtn");
-    const configPanel   = document.getElementById("configPanel");
-    const workerUrlIn   = document.getElementById("workerUrl");
-    const saveConfigBtn = document.getElementById("saveConfigBtn");
-    const toastEl       = document.getElementById("toast");
+    const statusBadge  = document.getElementById("statusBadge");
+    const statusText   = document.getElementById("statusText");
+    const toggleBtn    = document.getElementById("toggleBtn");
+    const lastUpdateEl = document.getElementById("lastUpdate");
+    const refreshBtn   = document.getElementById("refreshBtn");
+    const toastEl      = document.getElementById("toast");
 
     let currentEnabled = null;
-
-    function getWorkerUrl() {
-      return (localStorage.getItem("cb_worker_url") || DEFAULT_WORKER_URL).replace(/\/+$/, "");
-    }
 
     function showToast(msg, isError = false) {
       toastEl.textContent = msg;
@@ -280,18 +217,11 @@
     }
 
     async function fetchStatus() {
-      const url = getWorkerUrl();
-      if (!url || url.includes("nama-worker-kamu")) {
-        configPanel.classList.add("open");
-        showToast("Masukkan URL Cloudflare Worker kamu dulu.", true);
-        return;
-      }
-
       toggleBtn.disabled = true;
       showToast("Mengambil status dari server...");
 
       try {
-        const res = await fetch(`${url}/status`, {
+        const res = await fetch(`${WORKER_URL}/status`, {
           method: "GET",
           cache: "no-store"
         });
@@ -307,14 +237,13 @@
 
     async function toggleBot() {
       if (currentEnabled === null) return;
-      const url = getWorkerUrl();
       const targetState = !currentEnabled;
 
       toggleBtn.disabled = true;
       showToast(targetState ? "Menghidupkan bot..." : "Mematikan bot...");
 
       try {
-        const res = await fetch(`${url}/toggle`, {
+        const res = await fetch(`${WORKER_URL}/toggle`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ enabled: targetState })
@@ -334,14 +263,7 @@
 
     toggleBtn.addEventListener("click", toggleBot);
     refreshBtn.addEventListener("click", fetchStatus);
-    configBtn.addEventListener("click", () => configPanel.classList.toggle("open"));
-    saveConfigBtn.addEventListener("click", () => {
-      localStorage.setItem("cb_worker_url", workerUrlIn.value.trim().replace(/\/+$/, ""));
-      configPanel.classList.remove("open");
-      fetchStatus();
-    });
 
-    workerUrlIn.value = getWorkerUrl();
     fetchStatus();
   </script>
 </body>
